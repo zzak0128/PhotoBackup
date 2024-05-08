@@ -1,6 +1,6 @@
 ﻿namespace PhotoBackup.Library;
 
-public class Class1
+public interface IFileInfo
 {
 
 }
