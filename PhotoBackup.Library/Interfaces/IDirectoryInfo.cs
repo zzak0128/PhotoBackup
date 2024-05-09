@@ -1,12 +1,12 @@
-﻿namespace PhotoBackup.Library;
+﻿using MediaDevices;
 
-public interface IDirectoryInfo
+namespace PhotoBackup.Library;
+
+public interface IDirectoryInfo<T>
 {
     public string PhotoDirectoryPath { get; set; }
 
-    public IEnumerable<IFileInfo> FileList { get; set; }
+    public IList<T> FileList { get; set; }
 
     public int Count();   
-
-    public List<IFileInfo> GetFiles();
 }

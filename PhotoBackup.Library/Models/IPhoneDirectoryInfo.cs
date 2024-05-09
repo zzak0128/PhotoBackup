@@ -2,24 +2,24 @@
 
 namespace PhotoBackup.Library;
 
-public class IPhoneDirectoryInfo : IDirectoryInfo
+public class IPhoneDirectoryInfo : IDirectoryInfo<MediaFileInfo>
 {
     public string PhotoDirectoryPath { get; set; }
 
-    public IEnumerable<IFileInfo> FileList { get; set; }
+    public IList<MediaFileInfo> FileList { get; set; }
 
-    public IPhoneDirectoryInfo(string directoryPath)
+    public IPhoneDirectoryInfo()
     {
-        PhotoDirectoryPath = directoryPath;
+        PhotoDirectoryPath = @"/Internal Storage/";
         FileList = [];
     }
 
-    public int Count()
+    public IPhoneDirectoryInfo(string directoryPath)
     {
-        throw new NotImplementedException();
+        
     }
 
-    public List<IFileInfo> GetFiles()
+    public int Count()
     {
         throw new NotImplementedException();
     }

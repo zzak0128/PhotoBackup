@@ -3,7 +3,5 @@
 public enum DeviceType
 {
     iPhone,
-    Android,
-    Local,
-    SFTP
+    Android
 }
