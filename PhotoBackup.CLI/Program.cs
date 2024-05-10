@@ -37,14 +37,16 @@
 
 using PhotoBackup.Library;
 
-using (var scanner = new IPhonePhotoBackup())
-{
-    scanner.Scan(DeviceType.iPhone);
-    Console.WriteLine(scanner.Device.FriendlyName);
-    foreach (var file in scanner.ActiveDirectory.FileList)
-    {
-        Console.WriteLine(file.FullName);
-    }
-}
+//using (var scanner = new IPhonePhotoBackup())
+//{
+//    scanner.Scan(DeviceType.iPhone);
+//    Console.WriteLine(scanner.Device.FriendlyName);
+//    foreach (var file in scanner.ActiveDirectory.FileList)
+//    {
+//        Console.WriteLine(file.FullName);
+//    }
 
-Console.ReadLine();
+//    scanner.DownloadScannedFiles(@"C:\users\703434671\Downloads\PhotoTest");
+//}
+
+DirectoryOrganizer.Organize(@"C:\users\703434671\Downloads\PhotoTest");

@@ -1,9 +1,11 @@
-﻿namespace PhotoBackup.Library.Interfaces;
+﻿using System.Runtime.CompilerServices;
+
+namespace PhotoBackup.Library.Interfaces;
 
 public interface IFileScanner : IDisposable
 {
     public void Scan(DeviceType deviceType);
 
-    public void Download(string downloadPath);
+    public void DownloadScannedFiles(string downloadPath);
 
 }
