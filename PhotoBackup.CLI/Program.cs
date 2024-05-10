@@ -1,4 +1,19 @@
-﻿//using PhotoBackup.CLI.Views;
+﻿using Microsoft.Extensions.Configuration;
+using PhotoBackup.Library.Models;
+
+var builder = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("config.json", optional: false);
+
+IConfiguration config  = builder.Build();
+
+DirectoryConfig directorySettings = config.GetSection("DirectoryPaths").Get<DirectoryConfig>();
+directorySettings.IPhoneDirectory = "New Path";
+
+Console.WriteLine(directorySettings.IPhoneDirectory);
+Console.ReadLine();
+
+//using PhotoBackup.CLI.Views;
 
 //if (args.Length == 0)
 //{
@@ -35,7 +50,7 @@
 //}
 
 
-using PhotoBackup.Library;
+//using PhotoBackup.Library;
 
 //using (var scanner = new IPhonePhotoBackup())
 //{
@@ -49,4 +64,4 @@ using PhotoBackup.Library;
 //    scanner.DownloadScannedFiles(@"C:\users\703434671\Downloads\PhotoTest");
 //}
 
-DirectoryOrganizer.Organize(@"C:\users\703434671\Downloads\PhotoTest");
+//DirectoryOrganizer.Organize(@"C:\users\703434671\Downloads\PhotoTest");
