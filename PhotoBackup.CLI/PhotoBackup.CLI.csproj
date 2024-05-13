@@ -9,6 +9,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="config.default.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

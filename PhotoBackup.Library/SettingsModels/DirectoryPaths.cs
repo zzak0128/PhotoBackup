@@ -1,6 +1,6 @@
-﻿namespace PhotoBackup.Library.Models;
+﻿namespace PhotoBackup.Library.SettingsModels;
 
-public class DirectoryConfig
+public class DirectoryPaths
 {
     public string IPhoneDirectory { get; set; } = "";
 

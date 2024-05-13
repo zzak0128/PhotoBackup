@@ -9,13 +9,20 @@ public class LocalDirectoryInfo : IDirectoryInfo<FileInfo>
     public LocalDirectoryInfo(string directoryPath)
     {
         PhotoDirectoryPath = directoryPath;
-        FileList = [];
+
+        FileList = GetFiles();
+    }
+
+    public IList<FileInfo> GetFiles()
+    {
+        DirectoryInfo directoryInfo = new DirectoryInfo(PhotoDirectoryPath);
+        FileList = directoryInfo.GetFiles();
+
+        return FileList;
     }
 
     public int Count()
     {
-        //Get valid files in given directory and return count of files
-        throw new NotImplementedException();
+        return FileList.Count;
     }
-
 }

@@ -2,7 +2,11 @@
 
 public interface IDirectoryInfo<T>
 {
-    public string PhotoDirectoryPath { get; set; }
+    string PhotoDirectoryPath { get; set; }
 
-    public IList<T> FileList { get; set; }
+    IList<T> FileList { get; set; }
+
+    IList<T> GetFiles();
+
+    int Count();
 }

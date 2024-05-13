@@ -2,10 +2,10 @@
 
 namespace PhotoBackup.Library.Interfaces;
 
-public interface IFileScanner : IDisposable
+public interface IFileScanner
 {
-    public void Scan(DeviceType deviceType);
+   // public void Scan(DeviceType deviceType);
 
-    public void DownloadScannedFiles(string downloadPath);
+    public void DownloadScannedFiles();
 
 }

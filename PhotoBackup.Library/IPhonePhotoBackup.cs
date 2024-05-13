@@ -1,93 +1,108 @@
 ﻿using ImageMagick;
 using MediaDevices;
 using PhotoBackup.Library.Interfaces;
+using PhotoBackup.Library.SettingsModels;
 
 namespace PhotoBackup.Library
 {
     public class IPhonePhotoBackup : IFileScanner
     {
-        public IDirectoryInfo<MediaFileInfo> ActiveDirectory { get; set; } = new IPhoneDirectoryInfo();
+        private readonly ISettings _settings;
 
-        public MediaDevice Device { get; set; }
+        public IDirectoryInfo<MediaFileInfo> ActiveDirectory { get; set; }
 
-        public IPhonePhotoBackup()
+        public IPhonePhotoBackup(ISettings settings)
         {
-            try
-            {
-                var devices = MediaDevice.GetDevices();
-                Device = devices.First(d => d.FriendlyName.Contains("iPhone"));
-                Device.Connect();
-            }
-            catch (Exception e)
-            {
-                throw new Exception("No devices are connected");
-            }
+            _settings = settings;
+
+            ActiveDirectory = new IPhoneDirectoryInfo(_settings.DirectoryPaths.IPhoneDirectory);
         }
 
-        public void Scan(DeviceType deviceType)
+        public void DownloadScannedFiles()
         {
-            if (Device.IsConnected == false)
-            {
-                throw new Exception("Device is not connected");
-            }
+            var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
+            Directory.CreateDirectory(destinationPath);
 
-            ActiveDirectory = new IPhoneDirectoryInfo();
+            bool isDifferent = CompareAndUpdate();
 
-            if (Device.DirectoryExists(ActiveDirectory.PhotoDirectoryPath))
+            if (isDifferent)
             {
-                try
+                using (MediaDevice? device = MediaDevice.GetDevices().FirstOrDefault(x => x.FriendlyName.Contains("iPhone")))
                 {
-                    var deviceDirectories = Device.GetDirectories(ActiveDirectory.PhotoDirectoryPath);
-
-                    foreach (var directory in deviceDirectories)
+                    if (device == null)
                     {
-                        MediaDirectoryInfo directoryInfo = Device.GetDirectoryInfo(directory);
-                        foreach (var file in directoryInfo.EnumerateFiles())
-                        {
-                            ActiveDirectory.FileList.Add(file);
-                        }
+                        throw new Exception("No Device Detected, unable to fetch directory contents");
                     }
-                }
-                catch
-                {
-                    throw;
+
+                    if (device.IsConnected == false)
+                    {
+                        device.Connect();
+                    }
+
+                    device.Connect();
+
+                    foreach (var file in ActiveDirectory.FileList)
+                    {
+                        string fullDownloadPath = Path.Combine(destinationPath, file.Name);
+                        FileInfo deviceFileInfo = new(file.FullName);
+                        if (deviceFileInfo.Extension == ".MOV" || deviceFileInfo.Extension == ".AAE")
+                        {
+                            var fileLength = (file.Length / 1024f) / 1024f;
+                            if (fileLength >= 6)
+                            {
+                                file.CopyTo(fullDownloadPath, true);
+                                Console.WriteLine(file.FullName);
+                            }
+                        }
+                        else
+                        {
+                            // Need to check with proper extension before downloading. Currently, it downloads regardless
+                            file.CopyTo(fullDownloadPath, true);
+                            Console.WriteLine(file.FullName);
+
+                            if (_ = new FileInfo(file.FullName).Extension == ".HEIC")
+                            {
+                                ConvertToJpeg(fullDownloadPath, destinationPath);
+                                File.Delete(fullDownloadPath);
+                            }
+                        }
+                        Console.WriteLine(file.FullName);
+                    }
+                    device.Disconnect();
                 }
             }
-
         }
 
-        public void DownloadScannedFiles(string downloadPath)
+        private bool CompareAndUpdate()
         {
-            Directory.CreateDirectory(downloadPath);
+            bool output = true;
 
-            if (Device.IsConnected == false)
-            {
-                throw new Exception("Device is not connected");
-            }
+            IDirectoryInfo<FileInfo> directoryToCompare = new LocalDirectoryInfo(_settings.DirectoryPaths.DestinationDirectory);
+            List<MediaFileInfo> filesToRemove = new List<MediaFileInfo>();
 
             foreach (var file in ActiveDirectory.FileList)
             {
-                string fullDownloadPath = Path.Combine(downloadPath, file.Name);
-                FileInfo deviceFileInfo = new(file.FullName);
-                if (deviceFileInfo.Extension == ".MOV" || deviceFileInfo.Extension == ".AAE")
+                foreach (var filecomp in directoryToCompare.FileList)
                 {
-                    var fileLength = (file.Length / 1024f) / 1024f;
-                    if (fileLength >= 6)
+                    if (file.Name == filecomp.Name)
                     {
-                        file.CopyTo(fullDownloadPath, true);
-                    }
-                }
-                else
-                {
-                    file.CopyTo(fullDownloadPath, true);
-
-                    if (_ = new FileInfo(file.FullName).Extension == ".HEIC")
-                    {
-                        ConvertToJpeg(fullDownloadPath, downloadPath);
-                        File.Delete(fullDownloadPath);
+                        filesToRemove.Add(file);
+                        //Console.WriteLine($"{file.Name} already exists at destination");
                     }
                 }
             }
+
+            foreach (var file in filesToRemove)
+            {
+                ActiveDirectory.FileList.Remove(file);
+            }
+
+            if (filesToRemove.Count == 0)
+            {
+                output = false;
+            }
+
+            return output;
         }
 
         private void ConvertToJpeg(string fileName, string outputPath)
@@ -104,17 +119,6 @@ namespace PhotoBackup.Library
             {
                 throw;
             }
-        }
-
-        public void Dispose()
-        {
-            if (Device is null)
-            {
-                return;
-            }
-
-            Device.Disconnect();
-            Device.Dispose();
         }
     }
 }

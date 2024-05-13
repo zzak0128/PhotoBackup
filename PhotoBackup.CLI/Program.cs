@@ -1,17 +1,54 @@
-﻿using Microsoft.Extensions.Configuration;
-using PhotoBackup.Library.Models;
+﻿using PhotoBackup.Library.Extensions;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using PhotoBackup.CLI;
+using PhotoBackup.Library.SettingsModels;
 
-var builder = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("config.json", optional: false);
+var builder = CreateHostBuilder(args);
+using IHost host = builder.Build();
 
-IConfiguration config  = builder.Build();
+using var scope = host.Services.CreateScope();
+var services = scope.ServiceProvider;
 
-DirectoryConfig directorySettings = config.GetSection("DirectoryPaths").Get<DirectoryConfig>();
-directorySettings.IPhoneDirectory = "New Path";
+try
+{
+    services.GetRequiredService<App>().Run(args);
+}
+catch (Exception e)
+{
+    Console.WriteLine(e.Message);
+    await host.StopAsync();
+}
 
-Console.WriteLine(directorySettings.IPhoneDirectory);
-Console.ReadLine();
+
+IHostBuilder CreateHostBuilder(string[] args)
+{
+    IConfiguration config = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("config.json", false)
+            .Build();
+
+    Settings settings = BuildSettingsFromConfig(config);
+
+    return Host.CreateDefaultBuilder(args)
+        .ConfigureServices((_, services) =>
+        {
+            services.AddSingleton(config);
+            services.AddSingleton<ISettings>(settings);
+            services.AddSingleton<App>();
+        });
+}
+
+Settings BuildSettingsFromConfig(IConfiguration config)
+{
+    Settings settings = new()
+    {
+        DirectoryPaths = config.BuildSettings<DirectoryPaths>(),
+    };
+
+    return settings;
+}
 
 //using PhotoBackup.CLI.Views;
 
