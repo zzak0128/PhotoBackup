@@ -1,4 +1,6 @@
-﻿namespace PhotoBackup.Library.SettingsModels;
+﻿using PhotoBackup.Library.Interfaces;
+
+namespace PhotoBackup.Library.SettingsModels;
 
 public class Settings : ISettings
 {

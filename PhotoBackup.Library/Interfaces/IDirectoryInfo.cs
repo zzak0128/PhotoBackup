@@ -1,12 +1,14 @@
-﻿namespace PhotoBackup.Library;
+﻿using System.Collections;
 
-public interface IDirectoryInfo<T>
+namespace PhotoBackup.Library;
+
+public interface IDirectoryInfo
 {
     string PhotoDirectoryPath { get; set; }
 
-    IList<T> FileList { get; set; }
+    IList FileList { get; set; }
 
-    IList<T> GetFiles();
+    IList GetFiles();
 
     int Count();
 }

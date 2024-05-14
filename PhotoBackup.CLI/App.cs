@@ -1,5 +1,6 @@
-﻿using PhotoBackup.Library;
-using PhotoBackup.Library.SettingsModels;
+﻿using CommandLine;
+using PhotoBackup.CLI.CLIWorkflows;
+using PhotoBackup.Library.Interfaces;
 
 namespace PhotoBackup.CLI;
 
@@ -15,41 +16,39 @@ public class App
     public void Run(string[] args)
     {
 
-        IPhonePhotoBackup backup = new(_settings);
- 
-        Console.Clear();
-        Console.WriteLine(backup.ActiveDirectory.Count());
+        Parser.Default.ParseArguments<CLIOptions>(args)
+            .WithParsed(RunOptions)
+            .WithNotParsed(HandleParseErrors);
+    }
 
-        backup.DownloadScannedFiles();
-
-        Console.WriteLine(backup.ActiveDirectory.Count());
-        Console.ReadLine();
-        //backup.DownloadScannedFiles();
-
-
-        //Console.WriteLine("Download?");
-        //ConsoleKeyInfo keyPressed = Console.ReadKey();
-        //if(keyPressed.Key == ConsoleKey.Y)
-        //{
-        //    backup.DownloadScannedFiles();
-        //}
-        //else
-        //{
-        //    Console.WriteLine("Closing Application");
-        //    Console.ReadLine();
-        //    Environment.Exit(0);
-        //}
-
-        if (args.Length == 0)
+    internal void RunOptions(CLIOptions options)
+    {
+        if(options.DestinationDirectory != null)
         {
-            Console.WriteLine("No Arguments");
+            _settings.DirectoryPaths.DestinationDirectory = options.DestinationDirectory;
+        }
+
+        if(options.IsIphone)
+        {
+            try
+            {
+                IPhoneWorkflow.Run(_settings);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.WriteLine("Failed to backup photos from iPhone");
+            }
         }
         else
         {
-            foreach (string arg in args)
-            {
-                Console.WriteLine(arg);
-            }
+            LocalWorkflow.Run(_settings);
         }
+        //Console.WriteLine(options.Verbose);
+    }
+
+    internal void HandleParseErrors(IEnumerable<Error> errors)
+    {
+        Console.WriteLine("There was an error with the option");
     }
 }

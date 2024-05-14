@@ -1,12 +1,13 @@
 ﻿using MediaDevices;
+using System.Collections;
 
 namespace PhotoBackup.Library;
 
-public class IPhoneDirectoryInfo : IDirectoryInfo<MediaFileInfo>
+public class IPhoneDirectoryInfo : IDirectoryInfo
 {
     public string PhotoDirectoryPath { get; set; }
 
-    public IList<MediaFileInfo> FileList { get; set; } = [];
+    public IList FileList { get; set; }
 
     public IPhoneDirectoryInfo()
     {
@@ -20,9 +21,9 @@ public class IPhoneDirectoryInfo : IDirectoryInfo<MediaFileInfo>
         FileList = GetFiles();
     }
 
-    public IList<MediaFileInfo> GetFiles()
+    public IList GetFiles()
     {
-        FileList.Clear();
+        FileList = new List<MediaFileInfo>();
 
         MediaDevice device = MediaDevice.GetDevices().FirstOrDefault(x => x.FriendlyName.Contains("iPhone"));
         
@@ -62,9 +63,11 @@ public class IPhoneDirectoryInfo : IDirectoryInfo<MediaFileInfo>
 
     public int Count()
     {
-        if (FileList.Any())
+        int count = FileList.Count;
+
+        if (count > 0)
         {
-            return FileList.Count;
+            return count;
         }
 
         throw new Exception("FileList has not been populated");

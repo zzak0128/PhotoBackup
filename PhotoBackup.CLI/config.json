@@ -1,7 +1,7 @@
 {
   "DirectoryPaths": {
     "IPhoneDirectory": "/Internal Storage/",
-    "DestinationDirectory": "C:/Users/703434671/Downloads/PhotoTest"
-    //"DestinationDirectory": "\\\\sanford1\\home$\\703434671\\PhotoTest"
+    "DestinationDirectory": "C:/Users/703434671/Downloads/PhotoTest",
+    "LocalDirectory": "C:/Users/703434671/Downloads/PhotosToBackup"
   }
 }

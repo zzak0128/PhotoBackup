@@ -1,19 +1,22 @@
-﻿namespace PhotoBackup.Library;
+﻿using System.Collections;
 
-public class LocalDirectoryInfo : IDirectoryInfo<FileInfo>
+namespace PhotoBackup.Library;
+
+public class LocalDirectoryInfo : IDirectoryInfo
 {
     public string PhotoDirectoryPath { get; set; }
 
-    public IList<FileInfo> FileList { get; set; }
+    public IList FileList { get; set; }
+
 
     public LocalDirectoryInfo(string directoryPath)
     {
         PhotoDirectoryPath = directoryPath;
-
+        FileList = new List<FileInfo>();
         FileList = GetFiles();
     }
 
-    public IList<FileInfo> GetFiles()
+    public IList GetFiles()
     {
         DirectoryInfo directoryInfo = new DirectoryInfo(PhotoDirectoryPath);
         FileList = directoryInfo.GetFiles();
@@ -23,6 +26,13 @@ public class LocalDirectoryInfo : IDirectoryInfo<FileInfo>
 
     public int Count()
     {
-        return FileList.Count;
+        int count = FileList.Count;
+
+        if (count > 0)
+        {
+            return count;
+        }
+
+        throw new Exception("No files found in local directory");
     }
 }
