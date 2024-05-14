@@ -28,11 +28,6 @@ public class LocalDirectoryInfo : IDirectoryInfo
     {
         int count = FileList.Count;
 
-        if (count > 0)
-        {
-            return count;
-        }
-
-        throw new Exception("No files found in local directory");
+        return count;
     }
 }

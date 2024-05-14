@@ -8,18 +8,18 @@ internal static class LocalWorkflow
     internal static void Run(ISettings settings)
     {
         Console.WriteLine($"Scanning given directory for photos ({settings.DirectoryPaths.LocalDirectory})...");
-        // LocalPhotoBackup backup = new LocalBackup(setting);
+        LocalPhotoBackup backup = new LocalPhotoBackup(settings);
 
-        // Console.WriteLine($"Found {backup.ActiveDirectory.Count()} files in local directory");
+        Console.WriteLine($"Found {backup.ActiveDirectory.Count()} files in local directory");
         Console.WriteLine($"Beginning photo backup to {settings.DirectoryPaths.DestinationDirectory}");
 
-        // backup.BackupFiles();
+        backup.BackupFiles();
 
 
         Console.WriteLine("Backup Completed");
-        // Console.WriteLine($"{backup.ActiveDirectory.Count()} photos were backed up.");
+        Console.WriteLine($"{backup.ActiveDirectory.Count()} photos were backed up.");
 
-        Console.WriteLine("Would you like to organize the destination folder? Y or N");
+        Console.WriteLine("Would you like to organize the destination folder by date taken? Y or N");
         var keyPressed = Console.ReadKey(true);
         switch (keyPressed.Key)
         {
