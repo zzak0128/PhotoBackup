@@ -9,6 +9,7 @@ This will make it easy to backup to a local NAS as an example with potentially, 
 - C#
 - [MediaDevices](https://github.com/Bassman2/MediaDevices)
 - [Magick.NET.Core](https://github.com/dlemstra/Magick.NET)
+- [CommandLineParser](https://github.com/commandlineparser/commandline)
 
 ## Project Goals
 - One button backup of personal photo library
