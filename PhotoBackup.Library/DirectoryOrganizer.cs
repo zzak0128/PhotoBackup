@@ -14,15 +14,7 @@ public static class DirectoryOrganizer
         DirectoryInfo dir = new DirectoryInfo(directoryPath);
         foreach (var file in dir.GetFiles())
         {
-            DateTime fileDate;
-            try
-            {
-                fileDate = GetDateTaken(file);
-            }
-            catch
-            {
-                fileDate = file.LastWriteTime;
-            }
+            DateTime fileDate = GetDateTaken(file);
 
             var slash = Path.DirectorySeparatorChar;
             string moveToDirectory = $"{directoryPath}{slash}{fileDate.Date.Month}-{fileDate.Date.Year}";

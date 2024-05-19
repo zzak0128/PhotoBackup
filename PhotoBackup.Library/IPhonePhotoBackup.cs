@@ -1,10 +1,12 @@
-﻿using ImageMagick;
+﻿using System.Runtime.Versioning;
+using ImageMagick;
 using MediaDevices;
 using PhotoBackup.Library.Interfaces;
 using PhotoBackup.Library.Models;
 
 namespace PhotoBackup.Library;
 
+[SupportedOSPlatform("windows")]
 public class IPhonePhotoBackup : DirectoryBackup
 {
     public IPhonePhotoBackup(ISettings settings) : base(settings)
@@ -109,7 +111,7 @@ public class IPhonePhotoBackup : DirectoryBackup
                 image.Write($"{outputPath}/{Path.GetFileNameWithoutExtension(fileName)}.jpg");
             }
         }
-        catch (Exception)
+        catch
         {
             throw;
         }
