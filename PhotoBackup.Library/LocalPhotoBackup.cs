@@ -1,4 +1,5 @@
-﻿using PhotoBackup.Library.Interfaces;
+﻿using MediaDevices;
+using PhotoBackup.Library.Interfaces;
 using PhotoBackup.Library.Models;
 
 namespace PhotoBackup.Library;
@@ -10,7 +11,7 @@ public class LocalPhotoBackup : DirectoryBackup
         ActiveDirectory = new LocalDirectoryInfo(_settings.DirectoryPaths.LocalDirectory);
     }
 
-    public override void BackupFiles()
+    public override void BackupFiles(IProgress<ProgressReportModel> progress)
     {
         var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);

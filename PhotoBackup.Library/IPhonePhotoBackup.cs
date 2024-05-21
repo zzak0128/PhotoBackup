@@ -1,4 +1,5 @@
-﻿using System.Runtime.Versioning;
+﻿using System.Net.Http.Headers;
+using System.Runtime.Versioning;
 using ImageMagick;
 using MediaDevices;
 using PhotoBackup.Library.Interfaces;
@@ -14,7 +15,7 @@ public class IPhonePhotoBackup : DirectoryBackup
         ActiveDirectory = new IPhoneDirectoryInfo(_settings.DirectoryPaths.IPhoneDirectory);
     }
 
-    public override void BackupFiles()
+    public override void BackupFiles(IProgress<ProgressReportModel> progress)
     {
         var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);
@@ -36,6 +37,8 @@ public class IPhonePhotoBackup : DirectoryBackup
                 }
 
                 device.Connect();
+                ProgressReportModel report = new ProgressReportModel();
+                int filesDone = 0;
 
                 foreach (var file in ActiveDirectory.FileList)
                 {
@@ -49,13 +52,20 @@ public class IPhonePhotoBackup : DirectoryBackup
                         if (fileLength >= 6)
                         {
                             fileInfo.CopyTo(fullDownloadPath, true);
+                            report.CurrentFile = fileInfo.Name;
+                            filesDone++;
+                            report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
+                            progress.Report(report);
                         }
                     }
                     else
                     {
                         // Need to check with proper extension before downloading. Currently, it downloads regardless
                         fileInfo.CopyTo(fullDownloadPath, true);
-
+                        filesDone++;
+                        report.CurrentFile = fileInfo.Name;
+                        report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
+                        progress.Report(report);
                         if (_ = new FileInfo(fileInfo.FullName).Extension == ".HEIC")
                         {
                             ConvertToJpeg(fullDownloadPath, destinationPath);
@@ -63,10 +73,14 @@ public class IPhonePhotoBackup : DirectoryBackup
                         }
                     }
                 }
+                report.PercentageComplete = 100;
+                progress.Report(report);
+
                 device.Disconnect();
             }
         }
     }
+
 
     public override bool CompareAndUpdate()
     {

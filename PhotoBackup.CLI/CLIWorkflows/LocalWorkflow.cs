@@ -13,9 +13,9 @@ internal static class LocalWorkflow
         Console.WriteLine($"Found {backup.ActiveDirectory.Count()} files in local directory");
         Console.WriteLine($"Beginning photo backup to {settings.DirectoryPaths.DestinationDirectory}");
 
-        backup.BackupFiles();
+        //backup.BackupFiles();
 
-
+        Console.WriteLine(Environment.NewLine);
         Console.WriteLine("Backup Completed");
         Console.WriteLine($"{backup.ActiveDirectory.Count()} photos were backed up.");
 

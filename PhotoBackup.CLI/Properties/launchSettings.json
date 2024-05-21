@@ -2,7 +2,7 @@
   "profiles": {
     "PhotoBackup.CLI": {
       "commandName": "Project",
-      "commandLineArgs": "-l C:/users/703434671/Downloads/PhotosToBackup"
+      "commandLineArgs": "-i "
     }
   }
 }

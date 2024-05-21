@@ -1,4 +1,5 @@
-﻿using PhotoBackup.Library.Interfaces;
+﻿using MediaDevices;
+using PhotoBackup.Library.Interfaces;
 
 namespace PhotoBackup.Library.Models;
 
@@ -13,7 +14,7 @@ public abstract class DirectoryBackup
         _settings = settings;
     }
 
-    public abstract void BackupFiles();
+    public abstract void BackupFiles(IProgress<ProgressReportModel> progress);
 
     public abstract bool CompareAndUpdate();
     //{
