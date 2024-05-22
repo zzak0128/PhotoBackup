@@ -1,0 +1,9 @@
+{
+  "DirectoryPaths": {
+    "IPhoneDirectory": "/Internal Storage/",
+    //"DestinationDirectory": "C:/Users/703434671/Downloads/PhotoTest",
+    "DestinationDirectory": "C:/Users/zachz/Downloads/PhotoTest",
+    //"DestinationDirectory": "\\\\db.zakops.io\\totalbackup\\Photos\\Zak Photos",
+    "LocalDirectory": "C:/Users/703434671/Downloads/PhotosToBackup"
+  }
+}

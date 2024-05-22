@@ -5,7 +5,7 @@ using Microsoft.Extensions.Hosting;
 using PhotoBackup.CLI;
 using PhotoBackup.Library.SettingsModels;
 using PhotoBackup.Library.Interfaces;
-using CommandLine;
+
 
 var builder = CreateHostBuilder(args);
 using IHost host = builder.Build();
@@ -41,9 +41,6 @@ IHostBuilder CreateHostBuilder(string[] args)
             services.AddSingleton<App>();
         });
 }
-
-
-
 
 Settings BuildSettingsFromConfig(IConfiguration config)
 {

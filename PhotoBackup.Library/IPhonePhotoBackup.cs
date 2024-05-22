@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Headers;
-using System.Runtime.Versioning;
+﻿using System.Runtime.Versioning;
 using ImageMagick;
 using MediaDevices;
 using PhotoBackup.Library.Interfaces;
