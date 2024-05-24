@@ -28,6 +28,8 @@ namespace PhotoBackup.WinForm
 
             backupStartButton.Enabled = false;
             cancelButton.Enabled = true;
+            orgButton.Enabled = false;
+
             statusbarProgress.Visible = true;
             statusLabel.Text = "Backing Up";
             outputText.Text = $"Backing up {GetText(backupDirectoryText)} to {GetText(destinationText)}";
@@ -40,7 +42,7 @@ namespace PhotoBackup.WinForm
 
             await backup.BackupFilesAsync(progress, tokenSource.Token);
 
-            if(tokenSource.Token.IsCancellationRequested)
+            if (tokenSource.Token.IsCancellationRequested)
             {
                 outputText.Text += Environment.NewLine + "Backup has been termintated";
                 statusLabel.Text = "Ready";
@@ -55,7 +57,7 @@ namespace PhotoBackup.WinForm
             statusbarProgress.Visible = false;
             backupStartButton.Enabled = true;
             cancelButton.Enabled = false;
-
+            orgButton.Enabled = true;
         }
 
         private string GetText(TextBox textBox)
@@ -79,7 +81,24 @@ namespace PhotoBackup.WinForm
             outputText.Text += Environment.NewLine + "Stopping Backup";
             statusLabel.Text = "Stopping";
             await tokenSource.CancelAsync();
-           
+
+        }
+
+        private void orgButton_Click(object sender, EventArgs e)
+        {
+            outputText.Text = "Organizing Directory";
+            statusLabel.Text = "Organizing...";
+            try
+            {
+                DirectoryOrganizer.Organize(_settings.DirectoryPaths.DestinationDirectory);
+                outputText.Text += "Directory has been organized";
+                statusLabel.Text = "Ready";
+            }
+            catch (DirectoryNotFoundException)
+            {
+                outputText.Text = "ERROR: The directory could not be found or does not exist.";
+                statusLabel.Text = "Error";
+            }
         }
     }
 }

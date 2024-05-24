@@ -6,7 +6,7 @@ public static class DirectoryOrganizer
 {
     public static void Organize(string directoryPath)
     {
-        MoveFiles(directoryPath);
+            MoveFiles(directoryPath);
     }
 
     private static void MoveFiles(string directoryPath)
@@ -19,10 +19,16 @@ public static class DirectoryOrganizer
             var slash = Path.DirectorySeparatorChar;
             string moveToDirectory = $"{directoryPath}{slash}{fileDate.Date.Month}-{fileDate.Date.Year}";
             string fileName = file.Name;
+            Directory.CreateDirectory(moveToDirectory);
             try
             {
-                Directory.CreateDirectory(moveToDirectory);
                 file.MoveTo(Path.Combine(moveToDirectory, fileName));
+            }
+            catch (IOException)
+            {
+                Directory.CreateDirectory(Path.Combine(directoryPath, "Duplicates"));
+                file.MoveTo(Path.Combine(directoryPath, "Duplicates", fileName), true);
+                Console.WriteLine(file.Name);
             }
             catch
             {
@@ -33,7 +39,16 @@ public static class DirectoryOrganizer
 
     private static DateTime GetDateTaken(FileInfo image)
     {
-        var imageFile = new MagickImage(image);
+        MagickImage? imageFile;
+        try
+        {
+            imageFile = new MagickImage(image);
+
+        }
+        catch
+        {
+            return image.LastWriteTime;
+        }
         var exifProfile = imageFile.GetExifProfile();
         if (exifProfile is null)
         {

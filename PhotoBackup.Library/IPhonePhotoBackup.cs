@@ -75,8 +75,6 @@ public class IPhonePhotoBackup : DirectoryBackup
                                 File.Delete(fullDownloadPath);
                             }
                         }
-
-                       
                     }
                     else
                     {

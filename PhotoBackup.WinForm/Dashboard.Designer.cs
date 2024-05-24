@@ -39,6 +39,7 @@
             outputText = new TextBox();
             outputLabel = new Label();
             cancelButton = new Button();
+            orgButton = new Button();
             statusStrip.SuspendLayout();
             SuspendLayout();
             // 
@@ -67,7 +68,7 @@
             // 
             // backupStartButton
             // 
-            backupStartButton.Location = new Point(341, 83);
+            backupStartButton.Location = new Point(363, 83);
             backupStartButton.Name = "backupStartButton";
             backupStartButton.Size = new Size(140, 62);
             backupStartButton.TabIndex = 1;
@@ -137,11 +138,22 @@
             cancelButton.UseVisualStyleBackColor = true;
             cancelButton.Click += cancelButton_Click;
             // 
+            // orgButton
+            // 
+            orgButton.Location = new Point(655, 83);
+            orgButton.Name = "orgButton";
+            orgButton.Size = new Size(140, 62);
+            orgButton.TabIndex = 9;
+            orgButton.Text = "Organize";
+            orgButton.UseVisualStyleBackColor = true;
+            orgButton.Click += orgButton_Click;
+            // 
             // Dashboard
             // 
             AutoScaleDimensions = new SizeF(12F, 30F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(1155, 626);
+            Controls.Add(orgButton);
             Controls.Add(cancelButton);
             Controls.Add(outputLabel);
             Controls.Add(outputText);
@@ -175,5 +187,6 @@
         private TextBox outputText;
         private Label outputLabel;
         private Button cancelButton;
+        private Button orgButton;
     }
 }
