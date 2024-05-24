@@ -14,7 +14,7 @@ public abstract class DirectoryBackup
         _settings = settings;
     }
 
-    public abstract void BackupFiles(IProgress<ProgressReportModel> progress);
+    public abstract Task BackupFilesAsync(IProgress<ProgressReportModel> progress, CancellationToken cancellationToken);
 
     public abstract bool CompareAndUpdate();
     //{

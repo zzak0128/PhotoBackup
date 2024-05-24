@@ -7,6 +7,9 @@ namespace PhotoBackup.WinForm
     public partial class Dashboard : Form
     {
         private readonly ISettings _settings;
+
+        private CancellationTokenSource tokenSource;
+
         public Dashboard(ISettings settings)
         {
             _settings = settings;
@@ -21,6 +24,8 @@ namespace PhotoBackup.WinForm
 
         private async void backupStartButton_Click(object sender, EventArgs e)
         {
+            tokenSource = new CancellationTokenSource();
+
             backupStartButton.Enabled = false;
             cancelButton.Enabled = true;
             statusbarProgress.Visible = true;
@@ -33,14 +38,24 @@ namespace PhotoBackup.WinForm
             Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
             progress.ProgressChanged += ReportProgress;
 
-            await Task.Run(() => backup.BackupFiles(progress));
+            await backup.BackupFilesAsync(progress, tokenSource.Token);
 
-            outputText.Text += Environment.NewLine + "Backup Complete";
-            statusLabel.Text = "Ready";
+            if(tokenSource.Token.IsCancellationRequested)
+            {
+                outputText.Text += Environment.NewLine + "Backup has been termintated";
+                statusLabel.Text = "Ready";
+            }
+            else
+            {
+                outputText.Text += Environment.NewLine + "Backup Complete";
+                statusLabel.Text = "Ready";
+            }
+
             statusbarProgress.Value = 0;
             statusbarProgress.Visible = false;
             backupStartButton.Enabled = true;
             cancelButton.Enabled = false;
+
         }
 
         private string GetText(TextBox textBox)
@@ -61,7 +76,10 @@ namespace PhotoBackup.WinForm
 
         private async void cancelButton_Click(object sender, EventArgs e)
         {
-            
+            outputText.Text += Environment.NewLine + "Stopping Backup";
+            statusLabel.Text = "Stopping";
+            await tokenSource.CancelAsync();
+           
         }
     }
 }

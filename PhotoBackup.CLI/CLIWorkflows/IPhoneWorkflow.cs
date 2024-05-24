@@ -7,7 +7,7 @@ namespace PhotoBackup.CLI.CLIWorkflows;
 [SupportedOSPlatform("windows")]
 internal static class IPhoneWorkflow
 {
-    internal static void Run(ISettings settings)
+    internal static async Task Run(ISettings settings, CancellationToken cancellationToken)
     {
         Console.WriteLine($"Attempting to scan device for photos...");
         IPhonePhotoBackup backup = new IPhonePhotoBackup(settings);
@@ -19,7 +19,7 @@ internal static class IPhoneWorkflow
         Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
         progress.ProgressChanged += ReportProgress;
 
-        Task.Run(() => backup.BackupFiles(progress)).Wait();
+        await backup.BackupFilesAsync(progress, cancellationToken);
 
         Console.WriteLine("Backup Completed");
         Console.WriteLine($"{backup.ActiveDirectory.Count()} photos were backed up.");

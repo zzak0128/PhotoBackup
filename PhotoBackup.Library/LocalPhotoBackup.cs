@@ -1,5 +1,4 @@
-﻿using MediaDevices;
-using PhotoBackup.Library.Interfaces;
+﻿using PhotoBackup.Library.Interfaces;
 using PhotoBackup.Library.Models;
 
 namespace PhotoBackup.Library;
@@ -11,7 +10,7 @@ public class LocalPhotoBackup : DirectoryBackup
         ActiveDirectory = new LocalDirectoryInfo(_settings.DirectoryPaths.LocalDirectory);
     }
 
-    public override void BackupFiles(IProgress<ProgressReportModel> progress)
+    public override async Task BackupFilesAsync(IProgress<ProgressReportModel> progress, CancellationToken cancellationToken)
     {
         var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);
@@ -20,7 +19,10 @@ public class LocalPhotoBackup : DirectoryBackup
 
         if (isDifferent)
         {
-                foreach (var file in ActiveDirectory.FileList)
+
+            foreach (var file in ActiveDirectory.FileList)
+            {
+                if (cancellationToken.IsCancellationRequested == false)
                 {
                     FileInfo fileInfo = (FileInfo)file;
 
@@ -31,13 +33,13 @@ public class LocalPhotoBackup : DirectoryBackup
                         var fileLength = (fileInfo.Length / 1024f) / 1024f;
                         if (fileLength >= 6)
                         {
-                            fileInfo.CopyTo(fullDownloadPath, true);
+                           await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken);
                         }
                     }
                     else
                     {
                         // Need to check with proper extension before downloading. Currently, it downloads regardless
-                        fileInfo.CopyTo(fullDownloadPath, true);
+                        await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken);
 
                         if (fileInfo.Extension == ".HEIC")
                         {
@@ -45,13 +47,19 @@ public class LocalPhotoBackup : DirectoryBackup
                         }
                     }
                 }
+                else
+                {
+                    return;
+                }
             }
+
         }
-    
+    }
+
 
     public override bool CompareAndUpdate()
     {
-         bool hasChanges = true;
+        bool hasChanges = true;
 
         IDirectoryInfo directoryToCompare = new LocalDirectoryInfo(_settings.DirectoryPaths.DestinationDirectory);
         IList<FileInfo> filesToRemove = [];

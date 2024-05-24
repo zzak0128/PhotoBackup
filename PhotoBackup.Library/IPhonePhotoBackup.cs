@@ -14,7 +14,7 @@ public class IPhonePhotoBackup : DirectoryBackup
         ActiveDirectory = new IPhoneDirectoryInfo(_settings.DirectoryPaths.IPhoneDirectory);
     }
 
-    public override void BackupFiles(IProgress<ProgressReportModel> progress)
+    public override async Task BackupFilesAsync(IProgress<ProgressReportModel> progress, CancellationToken cancellationToken)
     {
         var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);
@@ -41,40 +41,53 @@ public class IPhonePhotoBackup : DirectoryBackup
 
                 foreach (var file in ActiveDirectory.FileList)
                 {
-                    MediaFileInfo fileInfo = (MediaFileInfo)file;
-
-                    string fullDownloadPath = Path.Combine(destinationPath, fileInfo.Name);
-                    FileInfo deviceFileInfo = new(fileInfo.FullName);
-                    if (deviceFileInfo.Extension == ".MOV" || deviceFileInfo.Extension == ".AAE")
+                    if (cancellationToken.IsCancellationRequested == false)
                     {
-                        var fileLength = (fileInfo.Length / 1024f) / 1024f;
-                        if (fileLength >= 6)
+                        MediaFileInfo fileInfo = (MediaFileInfo)file;
+
+                        string fullDownloadPath = Path.Combine(destinationPath, fileInfo.Name);
+                        FileInfo deviceFileInfo = new(fileInfo.FullName);
+                        if (deviceFileInfo.Extension == ".MOV" || deviceFileInfo.Extension == ".AAE")
                         {
-                            fileInfo.CopyTo(fullDownloadPath, true);
-                            report.CurrentFile = fileInfo.Name;
+                            var fileLength = (fileInfo.Length / 1024f) / 1024f;
+                            if (fileLength >= 6)
+                            {
+                                await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken);
+                                //fileInfo.CopyTo(fullDownloadPath, true);
+                                report.CurrentFile = fileInfo.Name;
+                                filesDone++;
+                                report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
+                                progress.Report(report);
+                            }
+                        }
+                        else
+                        {
+                            // Need to check with proper extension before downloading. Currently, it downloads regardless
+                            await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken);
+                            //fileInfo.CopyTo(fullDownloadPath, true);
                             filesDone++;
+                            report.CurrentFile = fileInfo.Name;
                             report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
                             progress.Report(report);
+                            if (_ = new FileInfo(fileInfo.FullName).Extension == ".HEIC")
+                            {
+                                ConvertToJpeg(fullDownloadPath, destinationPath);
+                                File.Delete(fullDownloadPath);
+                            }
                         }
+
+                       
                     }
                     else
                     {
-                        // Need to check with proper extension before downloading. Currently, it downloads regardless
-                        fileInfo.CopyTo(fullDownloadPath, true);
-                        filesDone++;
-                        report.CurrentFile = fileInfo.Name;
-                        report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
-                        progress.Report(report);
-                        if (_ = new FileInfo(fileInfo.FullName).Extension == ".HEIC")
-                        {
-                            ConvertToJpeg(fullDownloadPath, destinationPath);
-                            File.Delete(fullDownloadPath);
-                        }
+                        device.Disconnect();
+                        return;
                     }
                 }
-                report.PercentageComplete = 100;
-                progress.Report(report);
 
+                report.PercentageComplete = 100;
+                report.CurrentFile = "";
+                progress.Report(report);
                 device.Disconnect();
             }
         }

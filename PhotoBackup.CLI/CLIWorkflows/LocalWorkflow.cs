@@ -5,7 +5,7 @@ namespace PhotoBackup.CLI.CLIWorkflows;
 
 internal static class LocalWorkflow
 {
-    internal static void Run(ISettings settings)
+    internal static void RunAsync(ISettings settings, CancellationToken cancellationToken)
     {
         Console.WriteLine($"Scanning given directory for photos ({settings.DirectoryPaths.LocalDirectory})...");
         LocalPhotoBackup backup = new LocalPhotoBackup(settings);
@@ -13,7 +13,7 @@ internal static class LocalWorkflow
         Console.WriteLine($"Found {backup.ActiveDirectory.Count()} files in local directory");
         Console.WriteLine($"Beginning photo backup to {settings.DirectoryPaths.DestinationDirectory}");
 
-        //backup.BackupFiles();
+        //await backup.BackupFiles(cancellationToken);
 
         Console.WriteLine(Environment.NewLine);
         Console.WriteLine("Backup Completed");

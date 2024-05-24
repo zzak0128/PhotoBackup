@@ -7,6 +7,7 @@ namespace PhotoBackup.CLI;
 public class App
 {
     private readonly ISettings _settings;
+    private readonly CancellationTokenSource _cts = new CancellationTokenSource();
 
     public App(ISettings settings)
     {
@@ -32,7 +33,7 @@ public class App
         {
             try
             {
-                IPhoneWorkflow.Run(_settings);
+               IPhoneWorkflow.Run(_settings, _cts.Token).Wait();
             }
             catch (Exception ex)
             {
@@ -42,7 +43,7 @@ public class App
         }
         else
         {
-            LocalWorkflow.Run(_settings);
+            //LocalWorkflow.Run(_settings, _cts.Token).Wait();
         }
         //Console.WriteLine(options.Verbose);
     }
