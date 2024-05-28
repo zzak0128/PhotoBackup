@@ -6,20 +6,17 @@ namespace PhotoBackup.WinForm
 {
     public partial class Dashboard : Form
     {
-        private readonly ISettings _settings;
+        private CancellationTokenSource? tokenSource;
 
-        private CancellationTokenSource tokenSource;
-
-        public Dashboard(ISettings settings)
+        public Dashboard()
         {
-            _settings = settings;
             InitializeComponent();
         }
 
         private void Dashboard_Load(object sender, EventArgs e)
         {
-            backupDirectoryText.PlaceholderText = _settings.DirectoryPaths.IPhoneDirectory;
-            destinationText.PlaceholderText = _settings.DirectoryPaths.DestinationDirectory;
+            backupDirectoryText.PlaceholderText = UserSettings.Default.IPhoneDirectory;
+            destinationText.PlaceholderText = UserSettings.Default.DestinationDirectory;
         }
 
         private async void backupStartButton_Click(object sender, EventArgs e)
@@ -33,11 +30,11 @@ namespace PhotoBackup.WinForm
             statusbarProgress.Visible = true;
             statusLabel.Text = "Backing Up";
             outputText.Text = $"Backing up {GetText(backupDirectoryText)} to {GetText(destinationText)}";
-            IPhonePhotoBackup backup = new IPhonePhotoBackup(_settings);
+            IPhonePhotoBackup backup = new();
 
-            _settings.DirectoryPaths.DestinationDirectory = GetText(destinationText);
+            UserSettings.Default.DestinationDirectory = GetText(destinationText);
 
-            Progress<ProgressReportModel> progress = new Progress<ProgressReportModel>();
+            Progress<ProgressReportModel> progress = new();
             progress.ProgressChanged += ReportProgress;
 
             await backup.BackupFilesAsync(progress, tokenSource.Token);
@@ -80,7 +77,7 @@ namespace PhotoBackup.WinForm
         {
             outputText.Text += Environment.NewLine + "Stopping Backup";
             statusLabel.Text = "Stopping";
-            await tokenSource.CancelAsync();
+            await tokenSource!.CancelAsync();
 
         }
 
@@ -90,7 +87,7 @@ namespace PhotoBackup.WinForm
             statusLabel.Text = "Organizing...";
             try
             {
-                DirectoryOrganizer.Organize(_settings.DirectoryPaths.DestinationDirectory);
+                DirectoryOrganizer.Organize(UserSettings.Default.DestinationDirectory);
                 outputText.Text += "Directory has been organized";
                 statusLabel.Text = "Ready";
             }

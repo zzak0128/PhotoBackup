@@ -5,14 +5,14 @@ namespace PhotoBackup.Library;
 
 public class LocalPhotoBackup : DirectoryBackup
 {
-    public LocalPhotoBackup(ISettings settings) : base(settings)
+    public LocalPhotoBackup() : base()
     {
-        ActiveDirectory = new LocalDirectoryInfo(_settings.DirectoryPaths.LocalDirectory);
+        ActiveDirectory = new LocalDirectoryInfo(UserSettings.Default.LocalDirectory);
     }
 
     public override async Task BackupFilesAsync(IProgress<ProgressReportModel> progress, CancellationToken cancellationToken)
     {
-        var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
+        var destinationPath = UserSettings.Default.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);
 
         bool isDifferent = CompareAndUpdate();
@@ -61,7 +61,7 @@ public class LocalPhotoBackup : DirectoryBackup
     {
         bool hasChanges = true;
 
-        IDirectoryInfo directoryToCompare = new LocalDirectoryInfo(_settings.DirectoryPaths.DestinationDirectory);
+        IDirectoryInfo directoryToCompare = new LocalDirectoryInfo(UserSettings.Default.DestinationDirectory);
         IList<FileInfo> filesToRemove = [];
 
         foreach (var file in ActiveDirectory.FileList)

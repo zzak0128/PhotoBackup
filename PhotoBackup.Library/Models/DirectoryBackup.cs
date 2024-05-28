@@ -5,13 +5,10 @@ namespace PhotoBackup.Library.Models;
 
 public abstract class DirectoryBackup
 {
-    public ISettings _settings;
-
     public virtual IDirectoryInfo ActiveDirectory { get; set; }
 
-    public DirectoryBackup(ISettings settings)
+    public DirectoryBackup()
     {
-        _settings = settings;
     }
 
     public abstract Task BackupFilesAsync(IProgress<ProgressReportModel> progress, CancellationToken cancellationToken);

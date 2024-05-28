@@ -32,13 +32,10 @@ namespace PhotoBackup.WinForm
                     .AddJsonFile("config.json", false)
                     .Build();
 
-            Settings settings = BuildSettingsFromConfig(config);
-
             return Host.CreateDefaultBuilder()
                 .ConfigureServices((_, services) =>
                 {
                     services.AddSingleton(config);
-                    services.AddSingleton<ISettings>(settings);
                     services.AddSingleton<Dashboard>();
                 });
         }

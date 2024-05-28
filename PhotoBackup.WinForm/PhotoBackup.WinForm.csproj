@@ -17,6 +17,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="UserSettings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>UserSettings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="config.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

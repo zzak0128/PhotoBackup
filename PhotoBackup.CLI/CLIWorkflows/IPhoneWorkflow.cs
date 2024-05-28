@@ -10,7 +10,7 @@ internal static class IPhoneWorkflow
     internal static async Task Run(ISettings settings, CancellationToken cancellationToken)
     {
         Console.WriteLine($"Attempting to scan device for photos...");
-        IPhonePhotoBackup backup = new IPhonePhotoBackup(settings);
+        IPhonePhotoBackup backup = new IPhonePhotoBackup();
 
         Console.WriteLine($"Found {backup.ActiveDirectory.Count()} files on device");
         Console.WriteLine($"Beginning photo backup to {settings.DirectoryPaths.DestinationDirectory}");

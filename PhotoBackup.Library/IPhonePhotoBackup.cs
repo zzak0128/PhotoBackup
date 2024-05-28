@@ -9,14 +9,14 @@ namespace PhotoBackup.Library;
 [SupportedOSPlatform("windows")]
 public class IPhonePhotoBackup : DirectoryBackup
 {
-    public IPhonePhotoBackup(ISettings settings) : base(settings)
+    public IPhonePhotoBackup() : base()
     {
-        ActiveDirectory = new IPhoneDirectoryInfo(_settings.DirectoryPaths.IPhoneDirectory);
+        ActiveDirectory = new IPhoneDirectoryInfo(UserSettings.Default.IPhoneDirectory);
     }
 
     public override async Task BackupFilesAsync(IProgress<ProgressReportModel> progress, CancellationToken cancellationToken)
     {
-        var destinationPath = _settings.DirectoryPaths.DestinationDirectory;
+        var destinationPath = UserSettings.Default.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);
 
         bool isDifferent = CompareAndUpdate();
@@ -96,7 +96,7 @@ public class IPhonePhotoBackup : DirectoryBackup
     {
         bool hasChanges = true;
 
-        IDirectoryInfo directoryToCompare = new LocalDirectoryInfo(_settings.DirectoryPaths.DestinationDirectory);
+        IDirectoryInfo directoryToCompare = new LocalDirectoryInfo(UserSettings.Default.DestinationDirectory);
         IList<MediaFileInfo> filesToRemove = [];
 
         foreach (var file in ActiveDirectory.FileList)

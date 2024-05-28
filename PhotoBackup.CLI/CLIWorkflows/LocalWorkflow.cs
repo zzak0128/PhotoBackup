@@ -8,7 +8,7 @@ internal static class LocalWorkflow
     internal static void RunAsync(ISettings settings, CancellationToken cancellationToken)
     {
         Console.WriteLine($"Scanning given directory for photos ({settings.DirectoryPaths.LocalDirectory})...");
-        LocalPhotoBackup backup = new LocalPhotoBackup(settings);
+        LocalPhotoBackup backup = new LocalPhotoBackup();
 
         Console.WriteLine($"Found {backup.ActiveDirectory.Count()} files in local directory");
         Console.WriteLine($"Beginning photo backup to {settings.DirectoryPaths.DestinationDirectory}");
