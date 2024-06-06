@@ -1,5 +1,4 @@
 using PhotoBackup.Library;
-using PhotoBackup.Library.Interfaces;
 
 
 namespace PhotoBackup.WinForm
@@ -57,7 +56,7 @@ namespace PhotoBackup.WinForm
             orgButton.Enabled = true;
         }
 
-        private string GetText(TextBox textBox)
+        private static string GetText(TextBox textBox)
         {
             if (string.IsNullOrEmpty(textBox.Text))
             {
@@ -81,14 +80,16 @@ namespace PhotoBackup.WinForm
 
         }
 
-        private void orgButton_Click(object sender, EventArgs e)
+        private async void orgButton_Click(object sender, EventArgs e)
         {
+            tokenSource = new CancellationTokenSource();
+
             outputText.Text = "Organizing Directory";
             statusLabel.Text = "Organizing...";
             try
             {
-                DirectoryOrganizer.Organize(UserSettings.Default.DestinationDirectory);
-                outputText.Text += "Directory has been organized";
+                await DirectoryOrganizer.OrganizeAsync(UserSettings.Default.DestinationDirectory, tokenSource.Token);
+                outputText.Text = "Directory has been organized";
                 statusLabel.Text = "Ready";
             }
             catch (DirectoryNotFoundException)

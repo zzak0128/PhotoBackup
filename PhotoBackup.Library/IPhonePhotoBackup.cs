@@ -19,7 +19,7 @@ public class IPhonePhotoBackup : DirectoryBackup
         var destinationPath = UserSettings.Default.DestinationDirectory;
         Directory.CreateDirectory(destinationPath);
 
-        bool isDifferent = CompareAndUpdate();
+        bool isDifferent = await Task.Run(() => CompareAndUpdate(), cancellationToken).ConfigureAwait(false);
 
         if (isDifferent)
         {
@@ -52,26 +52,28 @@ public class IPhonePhotoBackup : DirectoryBackup
                             var fileLength = (fileInfo.Length / 1024f) / 1024f;
                             if (fileLength >= 6)
                             {
-                                await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken);
-                                //fileInfo.CopyTo(fullDownloadPath, true);
                                 report.CurrentFile = fileInfo.Name;
                                 filesDone++;
                                 report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
                                 progress.Report(report);
+                                await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken).ConfigureAwait(false);
+                                //fileInfo.CopyTo(fullDownloadPath, true);
                             }
                         }
                         else
                         {
-                            // Need to check with proper extension before downloading. Currently, it downloads regardless
-                            await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken);
-                            //fileInfo.CopyTo(fullDownloadPath, true);
                             filesDone++;
                             report.CurrentFile = fileInfo.Name;
                             report.PercentageComplete = (filesDone * 100) / ActiveDirectory.Count();
                             progress.Report(report);
+
+                            // TODO: Need to check with proper extension before downloading. Currently, it downloads regardless
+                            await Task.Run(() => fileInfo.CopyTo(fullDownloadPath, true), cancellationToken).ConfigureAwait(false);
+                            //fileInfo.CopyTo(fullDownloadPath, true);
+
                             if (_ = new FileInfo(fileInfo.FullName).Extension == ".HEIC")
                             {
-                                ConvertToJpeg(fullDownloadPath, destinationPath);
+                                await ConvertToJpegAsync(fullDownloadPath, destinationPath, cancellationToken).ConfigureAwait(false);
                                 File.Delete(fullDownloadPath);
                             }
                         }
@@ -125,14 +127,14 @@ public class IPhonePhotoBackup : DirectoryBackup
         return hasChanges;
     }
 
-    private void ConvertToJpeg(string fileName, string outputPath)
+    private static async Task ConvertToJpegAsync(string fileName, string outputPath, CancellationToken cancellationToken)
     {
         try
         {
             using (var image = new MagickImage(fileName))
             {
                 image.Format = MagickFormat.Jpeg;
-                image.Write($"{outputPath}/{Path.GetFileNameWithoutExtension(fileName)}.jpg");
+                await image.WriteAsync(fileName: $"{outputPath}/{Path.GetFileNameWithoutExtension(fileName)}.jpg", cancellationToken: cancellationToken);
             }
         }
         catch

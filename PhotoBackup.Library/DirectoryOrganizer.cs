@@ -4,35 +4,38 @@ namespace PhotoBackup.Library;
 
 public static class DirectoryOrganizer
 {
-    public static void Organize(string directoryPath)
+    public async static Task OrganizeAsync(string directoryPath, CancellationToken cancellationToken)
     {
-            MoveFiles(directoryPath);
+        await Task.Run(() => MoveFiles(directoryPath, cancellationToken), cancellationToken).ConfigureAwait(false);
     }
 
-    private static void MoveFiles(string directoryPath)
+    private static void MoveFiles(string directoryPath, CancellationToken cancellationToken)
     {
         DirectoryInfo dir = new DirectoryInfo(directoryPath);
         foreach (var file in dir.GetFiles())
         {
-            DateTime fileDate = GetDateTaken(file);
+            if (cancellationToken.IsCancellationRequested == false)
+            {
+                DateTime fileDate = GetDateTaken(file);
 
-            var slash = Path.DirectorySeparatorChar;
-            string moveToDirectory = $"{directoryPath}{slash}{fileDate.Date.Month}-{fileDate.Date.Year}";
-            string fileName = file.Name;
-            Directory.CreateDirectory(moveToDirectory);
-            try
-            {
-                file.MoveTo(Path.Combine(moveToDirectory, fileName));
-            }
-            catch (IOException)
-            {
-                Directory.CreateDirectory(Path.Combine(directoryPath, "Duplicates"));
-                file.MoveTo(Path.Combine(directoryPath, "Duplicates", fileName), true);
-                Console.WriteLine(file.Name);
-            }
-            catch
-            {
-                throw;
+                var slash = Path.DirectorySeparatorChar;
+                string moveToDirectory = $"{directoryPath}{slash}{fileDate.Date.Month}-{fileDate.Date.Year}";
+                string fileName = file.Name;
+                Directory.CreateDirectory(moveToDirectory);
+                try
+                {
+                    file.MoveTo(Path.Combine(moveToDirectory, fileName));
+                }
+                catch (IOException)
+                {
+                    Directory.CreateDirectory(Path.Combine(directoryPath, "Duplicates"));
+                    file.MoveTo(Path.Combine(directoryPath, "Duplicates", fileName), true);
+                    Console.WriteLine(file.Name);
+                }
+                catch
+                {
+                    throw;
+                }
             }
         }
     }
